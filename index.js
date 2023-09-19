@@ -1,51 +1,60 @@
-
-import  express  from 'express'
-import { GraphQLBoolean, GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql'
+import express from 'express'
+import { GraphQLInt, GraphQLObjectType,GraphQLSchema, GraphQLString } from 'graphql'
 const app = express()
-const port =3000
+const port = 3000
+
 import {createHandler} from'graphql-http/lib/use/express'
 
-app.get('/',(req,res)=>res.send('hello world'))
 
 const schema = new GraphQLSchema({
-    query: new GraphQLObjectType({
-        name:'maiQuerySchema',
+    query:new GraphQLObjectType({
+        name:'MainQuery',
         description:'Main',
         fields:{
             sayHello:{
                 type:GraphQLString,
                 resolve:()=>{
-                    return "hello"
+                    return "helloworld"
                 }
             },
-            returnBoolean:{
-                type:GraphQLBoolean,
-                resolve:()=>{
-                    return true
-                }
-            }
-        },
+        }
     }),
-    mutation: new GraphQLObjectType({
-        name:'mainmutation',
-        description:'Main',
+    mutation:new GraphQLObjectType({
+        name:'MainMutation',
+        description:"MainMut",
         fields:{
-            sayHello:{
-                type:GraphQLString,
-                resolve:()=>{
-                    return "hello"
-                }
-            },
-            returnBoolean:{
-                type:GraphQLBoolean,
-                resolve:()=>{
-                    return true
+            MutationSayHello:{
+                type:new GraphQLObjectType({
+                    name:'Respond',
+                    fields:{
+                        name:{type:GraphQLString},
+                        email:{type:GraphQLString},
+                        age:{type:GraphQLInt},
+                    },
+
+                }),
+                args:{
+                    name:{type:GraphQLString},
+                    email:{type:GraphQLString},
+                    age:{type:GraphQLInt},
+                },
+                resolve:(__,args)=>{
+                    const name =args.name
+                    const age=args.age
+                    const email=args.email
+
+                    return{
+                        name
+                    }
                 }
             }
-        },
+        }
     })
+
 })
+
+
+
 app.use('/graphql',createHandler({schema}))
-app.listen(port,()=>{
-    console.log(`app listening on port number ${port}`)
-})
+app.get('/', (req, res) => res.send('Hello World!'))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
